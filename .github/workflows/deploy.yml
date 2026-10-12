@@ -3,7 +3,7 @@ name: Deploy to FTP
 on:
   push:
     branches:
-      - develop
+      - prod
 
     workflow_dispatch:
     
@@ -15,10 +15,11 @@ jobs:
       - name: Get code
         uses: actions/checkout@v4
 
-      - name: Sync files
+      - name: Upload to Hostido via FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
+          port: ${{ secrets.FTP_PORT }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          # server-dir: /public_html/ # odkomentuj, jeśli pliki mają trafić do konkretnego podkatalogu
+          protocol: ftps

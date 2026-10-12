@@ -56,6 +56,75 @@
                         {textbox name="RESERVATION_TITLE" class="form-control has-feedback" value="ReservationTitle" id="reservationTitle" maxlength="300" required=$TitleRequired}
                     </div>
                 </div>
+
+                <div id="custom-attributes-placeholder"></div>
+
+
+<script>
+$(document).ready(function() {
+    function initCustomAttributeButtons(selector) {
+        var $select = $(selector);
+
+        if ($select.length && !$select.data('converted')) {
+            $select.data('converted', true);
+            $select.hide();
+
+            var $buttonGroup = $('<div class="custom-attr-buttons d-flex flex-wrap gap-2 mt-1"></div>');
+
+            $select.find('option').each(function() {
+                var val = $(this).val();
+                var text = $(this).text();
+
+                if (val !== "") {
+                    var isSelected = ($select.val() === val) ? 'active btn-primary' : 'btn-outline-secondary';
+                    var $btn = $('<button type="button" class="btn btn-sm ' + isSelected + '" data-value="' + val + '">' + text + '</button>');
+
+                    $btn.click(function() {
+                        $buttonGroup.find('button').removeClass('active btn-primary').addClass('btn-outline-secondary');
+                        $(this).removeClass('btn-outline-secondary').addClass('active btn-primary');
+
+                        $select.val(val).get(0).dispatchEvent(new Event('change', { bubbles: true }));
+                        $select.trigger('change');
+                    });
+
+                    $buttonGroup.append($btn);
+                }
+            });
+
+            $select.after($buttonGroup);
+        }
+    }
+
+    // Sprawdzamy cyklicznie oba elementy
+    var checkInterval = setInterval(function() {
+        var found1 = $('#psiattribute1').length > 0;
+        var found3 = $('#psiattribute3').length > 0;
+        var found4 = $('#psiattribute4').length > 0;
+
+        if (found1) {
+            initCustomAttributeButtons('#psiattribute1');
+        }
+        if (found3) {
+            initCustomAttributeButtons('#psiattribute3');
+        }
+         if (found4) {
+            initCustomAttributeButtons('#psiattribute4');
+        }
+
+        // Jeśli którykolwiek z nich się pojawił i obsłużyliśmy, kończymy interwał
+        if (found1 || found3 || found4) {
+            // Możesz odkomentować poniższą linię, jeśli na stronie występuje tylko jeden z nich na raz:
+            // clearInterval(checkInterval);
+        }
+    }, 200);
+
+    $(window).on('load', function() {
+        initCustomAttributeButtons('#psiattribute1');
+        initCustomAttributeButtons('#psiattribute3');
+    });
+});
+</script>
+
                 {assign var="detailsCol" value="col-12"}
 
                 {if $ShowParticipation && $AllowParticipation && $ShowReservationDetails}
@@ -204,11 +273,7 @@
                 <div class="reservationResources col-12 col-sm-6 py-2 border-bottom" id="reservation-resources">
                     <div class="d-flex align-items-center gap-2">
                         <label class="fw-bold mb-0">{translate key="Resources"}</label>
-                        {if $ShowAdditionalResources}
-                        <a id="btnAddResources" href="#" class="link-primary" data-bs-toggle="modal"
-                            data-bs-target="#dialogResourceGroups">{translate key=Change} <span
-                                class="bi bi-plus-square-fill"></span></a>
-                        {/if}
+
                     </div>
 
                     <div class="d-inline-block">
@@ -316,8 +381,6 @@
 
                 </div>
             </div>
-
-            <div id="custom-attributes-placeholder"></div>
 
             {if $UploadsEnabled}
             <div class="border-bottom py-2">
@@ -670,3 +733,29 @@
     </script>
 
     {include file='globalfooter.tpl'}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var form = document.querySelector('form.reservation-form') || document.querySelector('form');
+
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            // Pobieramy wszystkie customowe dropdowny atrybutów
+            var attributeSelects = document.querySelectorAll('.customAttribute');
+            var isAnySelected = false;
+
+            attributeSelects.forEach(function(select) {
+                if (select.value && select.value.trim() !== '') {
+                    isAnySelected = true;
+                }
+            });
+
+            // Jeśli żaden atrybut nie został wybrany, blokujemy wysłanie
+            if (!isAnySelected) {
+                e.preventDefault();
+                alert('Musisz wybrać co najmniej jedno sprzęt/akcesorium!');
+                return false;
+            }
+        });
+    }
+});
+</script>

@@ -23,8 +23,12 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftp
+          dangerous-allow-insecure-ssl: true
+          # Dodaj te opcje, aby zapobiec rozłączaniu socketu
+          timeout: 60000
           exclude: |
             **/.git*
             **/.git*/**
             **/node_modules/**
             **/.DS_Store
+            lib/**

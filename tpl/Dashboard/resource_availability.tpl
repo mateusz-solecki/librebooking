@@ -30,20 +30,15 @@
             {/foreach}
 
             {if $allFlatItems|count > 0}
-                <div class="row g-2">
+                <div class="row">
                     {foreach from=$allFlatItems item=i}
                         <div class="col-12 col-sm-6">
-                            <div class="availabilityItem p-2 border rounded align-items-center h-100">
-                                <span class="resourceName px-2 py-1 rounded-1 d-block text-truncate"
-                                    {if $i->GetColor()}style="background-color:{$i->GetColor()};color:{$i->GetTextColor()};" {/if}>
-
-                                    <i resource-id="{$i->ResourceId()}" class="resourceNameSelector bi bi-info-circle-fill"></i>
-                                    <a resource-id="{$i->ResourceId()}" class="resourceNameSelector text-decoration-none"
-                                        {if $i->GetColor()}style="color:{$i->GetTextColor()};" {/if}
+                            <div class="availabilityItem">
+                                    <a resource-id="{$i->ResourceId()}" class="resourceNameSelector"
                                         href="{$Path}{Pages::RESERVATION}?{QueryStringKeys::RESOURCE_ID}={$i->ResourceId()}">
                                         {$i->ResourceName()}
                                     </a>
-                                </span>
+
                             </div>
                         </div>
                     {/foreach}

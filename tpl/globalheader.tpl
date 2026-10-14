@@ -149,8 +149,7 @@
                 <div class="collapse navbar-collapse" id="librebooking-navigation">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         {if isset($LoggedIn) && $LoggedIn}
-                            <li class="nav-item" id="navDashboard"><a class="nav-link link-primary"
-                                    href="{$Path}{Pages::DASHBOARD}">{translate key="Dashboard"}</a></li>
+
                             <li class="nav-item dropdown" id="navMyAccountDropdown">
                                 <a href="#" class="nav-link  link-primary dropdown-toggle" role="button"
                                     data-bs-toggle="dropdown">{translate key="MyAccount"}</a>
@@ -176,6 +175,11 @@
                                     {/if}
                                 </ul>
                             </li>
+                            {if empty($CanViewAdmin)}
+                                <li class="nav-item" id="navMyCalendar">
+                                <a  class="nav-link link-primary" href="{$Path}{Pages::MY_CALENDAR}">{translate key="MyCalendar"}</a></li>
+                            {/if}
+                            {if isset($CanViewAdmin) && $CanViewAdmin}
                             <li class="nav-item dropdown" id="navScheduleDropdown">
                                 <a href="#" class="nav-link link-primary dropdown-toggle" role="button"
                                     data-bs-toggle="dropdown">{translate key="Schedule"}</a>
@@ -202,6 +206,7 @@
                                     </li>
                                 </ul>
                             </li>
+
                             <li class="nav-item dropdown" id="navReportsDropdown">
                                 <a href="#" class="nav-link link-primary dropdown-toggle" role="button"
                                     data-bs-toggle="dropdown">{translate key="Check"}</a>
@@ -214,8 +219,8 @@
                                     </li>
                                 </ul>
                             </li>
-                            {if isset($CanViewAdmin) && $CanViewAdmin}
-                                <li class="nav-item dropdown" id="navApplicationManagementDropdown">
+
+                            <li class="nav-item dropdown" id="navApplicationManagementDropdown">
                                     <a href="#" class="nav-link link-primary dropdown-toggle" role="button"
                                         data-bs-toggle="dropdown">{translate key="ApplicationManagement"}</a>
                                     <ul class="dropdown-menu">

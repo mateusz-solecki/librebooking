@@ -733,7 +733,130 @@ $(document).ready(function() {
     </script>
 
     {include file='globalfooter.tpl'}
-<script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+    // Słownik mapujący atrybuty, powiązane akcesoria oraz wartości
+    var attributeMap = {
+        '#psiattribute1': {
+            accessory: '#accessory1',
+            mapping: {
+                'TP1': 2,
+                'TP2': 3,
+                'TP3': 4,
+                'Trening bokserski': 3,
+                'Trening indywidualny': 1,
+                'Cała sala': 5
+            }
+        },
+        '#psiattribute4': {
+            accessory: '#accessory9',
+            mapping: {
+                'TP1': 2,
+                'TP2': 3,
+                'TP3': 4,
+                'Trening indywidualny': 1
+            }
+        }
+    };
+
+    // Inicjalizacja przycisków dla wskazanych pól
+    $.each(attributeMap, function(selector, config) {
+        var $select = $(selector);
+
+        if ($select.length && !$select.data('converted')) {
+            $select.data('converted', true);
+            $select.hide();
+
+            var $buttonGroup = $('<div class="custom-attr-buttons d-flex flex-wrap gap-2 mt-1"></div>');
+
+            $select.find('option').each(function() {
+                var val = $(this).val();
+                var text = $(this).text();
+
+                // Generujemy przyciski tylko dla zmapowanych opcji
+                if (val !== "" && config.mapping[val] !== undefined) {
+                    var isSelected = ($select.val() === val) ? 'active btn-primary' : 'btn-outline-secondary';
+                    var $btn = $('<button type="button" class="btn btn-sm ' + isSelected + '" data-value="' + val + '">' + text + '</button>');
+
+                    $btn.click(function() {
+                        $buttonGroup.find('button').removeClass('active btn-primary').addClass('btn-outline-secondary');
+                        $(this).removeClass('btn-outline-secondary').addClass('active btn-primary');
+
+                        // Zmiana wartości w select i wywołanie zdarzeń
+                        $select.val(val).get(0).dispatchEvent(new Event('change', { bubbles: true }));
+                        $select.trigger('change');
+                    });
+
+                    $buttonGroup.append($btn);
+                }
+            });
+
+            $select.after($buttonGroup);
+        }
+    });
+
+    // Wspólna obsługa logiki przypisania ilości akcesoriów po zmianie wartości
+    $(document).on('change', '#psiattribute1, #psiattribute4', function() {
+        var selector = '#' + $(this).attr('id');
+        var config = attributeMap[selector];
+        var val = $(this).val();
+
+        if (config && config.mapping[val] !== undefined) {
+            var ilosc = config.mapping[val];
+            var $input = $(config.accessory);
+
+            if ($input.length) {
+                $input.val(ilosc).trigger('input').trigger('change').trigger('blur');
+
+                setTimeout(function() {
+                    $('#btnConfirmAddAccessories').trigger('click');
+                }, 150);
+            }
+        }
+    });
+});
+
+
+$(document).ready(function() {
+    $(document).on('change', '#psiattribute3', function() {
+        var wybraneUrządzenie = $(this).val();
+        var accessoryId = null;
+
+        switch (wybraneUrządzenie) {
+            case 'Air bike': accessoryId = '5'; break;
+            case 'Bieżnia elektryczna': accessoryId = '7'; break;
+            case 'Bieżnia mechaniczna': accessoryId = '6'; break;
+            case 'Ergometr wioślarski': accessoryId = '8'; break;
+        }
+
+        // Najpierw odznaczamy wszystkie, żeby działała zasada jeden wybór
+        $('input[id^="accessory"]').filter(':checkbox').prop('checked', false).trigger('change');
+
+        if (accessoryId) {
+            var $checkbox = $('#accessory' + accessoryId);
+
+            if ($checkbox.length) {
+                // 1. Zaznaczamy checkbox i wywołujemy zdarzenia
+                $checkbox.prop('checked', true).trigger('input').trigger('change').trigger('blur');
+
+                // 2. Kliknięcie przycisku potwierdzenia akcesoriów po ułamku sekundy
+                setTimeout(function() {
+                    $('#btnConfirmAddAccessories').trigger('click');
+                }, 150);
+            }
+        }
+    });
+});
+
+</script>
+
+
+
+
+
+
+
 document.addEventListener('DOMContentLoaded', function() {
     var form = document.querySelector('form.reservation-form') || document.querySelector('form');
 

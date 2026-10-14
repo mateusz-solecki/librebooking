@@ -59,72 +59,6 @@
 
                 <div id="custom-attributes-placeholder"></div>
 
-
-<script>
-$(document).ready(function() {
-    function initCustomAttributeButtons(selector) {
-        var $select = $(selector);
-
-        if ($select.length && !$select.data('converted')) {
-            $select.data('converted', true);
-            $select.hide();
-
-            var $buttonGroup = $('<div class="custom-attr-buttons d-flex flex-wrap gap-2 mt-1"></div>');
-
-            $select.find('option').each(function() {
-                var val = $(this).val();
-                var text = $(this).text();
-
-                if (val !== "") {
-                    var isSelected = ($select.val() === val) ? 'active btn-primary' : 'btn-outline-secondary';
-                    var $btn = $('<button type="button" class="btn btn-sm ' + isSelected + '" data-value="' + val + '">' + text + '</button>');
-
-                    $btn.click(function() {
-                        $buttonGroup.find('button').removeClass('active btn-primary').addClass('btn-outline-secondary');
-                        $(this).removeClass('btn-outline-secondary').addClass('active btn-primary');
-
-                        $select.val(val).get(0).dispatchEvent(new Event('change', { bubbles: true }));
-                        $select.trigger('change');
-                    });
-
-                    $buttonGroup.append($btn);
-                }
-            });
-
-            $select.after($buttonGroup);
-        }
-    }
-
-    // Sprawdzamy cyklicznie oba elementy
-    var checkInterval = setInterval(function() {
-        var found1 = $('#psiattribute1').length > 0;
-        var found3 = $('#psiattribute3').length > 0;
-        var found4 = $('#psiattribute4').length > 0;
-
-        if (found1) {
-            initCustomAttributeButtons('#psiattribute1');
-        }
-        if (found3) {
-            initCustomAttributeButtons('#psiattribute3');
-        }
-         if (found4) {
-            initCustomAttributeButtons('#psiattribute4');
-        }
-
-        // Jeśli którykolwiek z nich się pojawił i obsłużyliśmy, kończymy interwał
-        if (found1 || found3 || found4) {
-            // Możesz odkomentować poniższą linię, jeśli na stronie występuje tylko jeden z nich na raz:
-            // clearInterval(checkInterval);
-        }
-    }, 200);
-
-    $(window).on('load', function() {
-        initCustomAttributeButtons('#psiattribute1');
-        initCustomAttributeButtons('#psiattribute3');
-    });
-});
-</script>
-
                 {assign var="detailsCol" value="col-12"}
 
                 {if $ShowParticipation && $AllowParticipation && $ShowReservationDetails}
@@ -732,11 +666,9 @@ $(document).ready(function() {
         }
     </script>
 
-    {include file='globalfooter.tpl'}
-
+    {literal}
 <script type="text/javascript">
 $(document).ready(function() {
-    // Słownik mapujący atrybuty, powiązane akcesoria oraz wartości
     var attributeMap = {
         '#psiattribute1': {
             accessory: '#accessory1',
@@ -760,43 +692,55 @@ $(document).ready(function() {
         }
     };
 
-    // Inicjalizacja przycisków dla wskazanych pól
-    $.each(attributeMap, function(selector, config) {
+    // Pola zamieniane na przyciski (null = wszystkie opcje)
+    var buttonFields = {
+        '#psiattribute1': attributeMap['#psiattribute1'].mapping,
+        '#psiattribute3': null,
+        '#psiattribute4': attributeMap['#psiattribute4'].mapping
+    };
+
+    function initButtons(selector, allowed) {
         var $select = $(selector);
+        if (!$select.length || $select.data('converted')) return;
 
-        if ($select.length && !$select.data('converted')) {
-            $select.data('converted', true);
-            $select.hide();
+        $select.data('converted', true);
+        $select.hide();
 
-            var $buttonGroup = $('<div class="custom-attr-buttons d-flex flex-wrap gap-2 mt-1"></div>');
+        var $buttonGroup = $('<div class="custom-attr-buttons d-flex flex-wrap gap-2 mt-1"></div>');
 
-            $select.find('option').each(function() {
-                var val = $(this).val();
-                var text = $(this).text();
+        $select.find('option').each(function() {
+            var val = $(this).val();
+            var text = $(this).text();
 
-                // Generujemy przyciski tylko dla zmapowanych opcji
-                if (val !== "" && config.mapping[val] !== undefined) {
-                    var isSelected = ($select.val() === val) ? 'active btn-primary' : 'btn-outline-secondary';
-                    var $btn = $('<button type="button" class="btn btn-sm ' + isSelected + '" data-value="' + val + '">' + text + '</button>');
+            if (val === "" || (allowed && allowed[val] === undefined)) return;
 
-                    $btn.click(function() {
-                        $buttonGroup.find('button').removeClass('active btn-primary').addClass('btn-outline-secondary');
-                        $(this).removeClass('btn-outline-secondary').addClass('active btn-primary');
+            var isSelected = ($select.val() === val) ? 'active btn-primary' : 'btn-outline-secondary';
+            var $btn = $('<button type="button" class="btn btn-sm ' + isSelected + '"></button>')
+                .attr('data-value', val)
+                .text(text);
 
-                        // Zmiana wartości w select i wywołanie zdarzeń
-                        $select.val(val).get(0).dispatchEvent(new Event('change', { bubbles: true }));
-                        $select.trigger('change');
-                    });
+            $btn.click(function() {
+                $buttonGroup.find('button').removeClass('active btn-primary').addClass('btn-outline-secondary');
+                $(this).removeClass('btn-outline-secondary').addClass('active btn-primary');
 
-                    $buttonGroup.append($btn);
-                }
+                $select.val(val).get(0).dispatchEvent(new Event('change', { bubbles: true }));
+                $select.trigger('change');
             });
 
-            $select.after($buttonGroup);
-        }
-    });
+            $buttonGroup.append($btn);
+        });
 
-    // Wspólna obsługa logiki przypisania ilości akcesoriów po zmianie wartości
+        $select.after($buttonGroup);
+    }
+
+    // Sprawdzamy stale: atrybuty mogą być przerysowane po zmianie daty/zasobu
+    setInterval(function() {
+        $.each(buttonFields, function(selector, allowed) {
+            initButtons(selector, allowed);
+        });
+    }, 200);
+
+    // Ilość akcesoriów po zmianie wartości
     $(document).on('change', '#psiattribute1, #psiattribute4', function() {
         var selector = '#' + $(this).attr('id');
         var config = attributeMap[selector];
@@ -815,64 +759,45 @@ $(document).ready(function() {
             }
         }
     });
-});
 
-
-$(document).ready(function() {
+    // Urządzenia (jeden wybór)
     $(document).on('change', '#psiattribute3', function() {
-        var wybraneUrządzenie = $(this).val();
+        var wybraneUrzadzenie = $(this).val();
         var accessoryId = null;
 
-        switch (wybraneUrządzenie) {
+        switch (wybraneUrzadzenie) {
             case 'Air bike': accessoryId = '5'; break;
             case 'Bieżnia elektryczna': accessoryId = '7'; break;
             case 'Bieżnia mechaniczna': accessoryId = '6'; break;
             case 'Ergometr wioślarski': accessoryId = '8'; break;
         }
 
-        // Najpierw odznaczamy wszystkie, żeby działała zasada jeden wybór
         $('input[id^="accessory"]').filter(':checkbox').prop('checked', false).trigger('change');
 
         if (accessoryId) {
             var $checkbox = $('#accessory' + accessoryId);
 
             if ($checkbox.length) {
-                // 1. Zaznaczamy checkbox i wywołujemy zdarzenia
                 $checkbox.prop('checked', true).trigger('input').trigger('change').trigger('blur');
 
-                // 2. Kliknięcie przycisku potwierdzenia akcesoriów po ułamku sekundy
                 setTimeout(function() {
                     $('#btnConfirmAddAccessories').trigger('click');
                 }, 150);
             }
         }
     });
-});
 
-</script>
-
-
-
-
-
-
-
-document.addEventListener('DOMContentLoaded', function() {
-    var form = document.querySelector('form.reservation-form') || document.querySelector('form');
-
+    // Blokada wysyłki bez wybranego sprzętu/akcesorium
+    var form = document.querySelector('#form-reservation');
     if (form) {
         form.addEventListener('submit', function(e) {
-            // Pobieramy wszystkie customowe dropdowny atrybutów
-            var attributeSelects = document.querySelectorAll('.customAttribute');
             var isAnySelected = false;
-
-            attributeSelects.forEach(function(select) {
+            document.querySelectorAll('.customAttribute').forEach(function(select) {
                 if (select.value && select.value.trim() !== '') {
                     isAnySelected = true;
                 }
             });
 
-            // Jeśli żaden atrybut nie został wybrany, blokujemy wysłanie
             if (!isAnySelected) {
                 e.preventDefault();
                 alert('Musisz wybrać co najmniej jedno sprzęt/akcesorium!');
@@ -882,3 +807,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+{/literal}
+
+    {include file='globalfooter.tpl'}

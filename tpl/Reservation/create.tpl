@@ -677,7 +677,7 @@ $(document).ready(function() {
                 'TP2': 3,
                 'TP3': 4,
                 'Trening bokserski': 3,
-                'Trening indywidualny': 1,
+                'Trening samodzielny': 1,
                 'Cała sala': 5
             }
         },
@@ -687,7 +687,7 @@ $(document).ready(function() {
                 'TP1': 2,
                 'TP2': 3,
                 'TP3': 4,
-                'Trening indywidualny': 1
+                'Trening samodzielny': 1
             }
         }
     };

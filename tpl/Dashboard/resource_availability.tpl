@@ -34,7 +34,7 @@
                     {foreach from=$allFlatItems item=i}
                         <div class="col-12 col-sm-6">
                             <div class="availabilityItem">
-                                    <a resource-id="{$i->ResourceId()}" class="resourceNameSelector"
+                                    <a resource-id="{$i->ResourceId()}" class="resourceNameSelectorMod"
                                         href="{$Path}{Pages::RESERVATION}?{QueryStringKeys::RESOURCE_ID}={$i->ResourceId()}">
                                         {$i->ResourceName()}
                                     </a>

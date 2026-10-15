@@ -3,11 +3,7 @@
 		<i class="bi bi-chevron-double-up" aria-hidden="true"></i>
 	</div>
 	<footer class="bg-light border-top text-center py-1" role="contentinfo">
-		{if $CompanyName neq ''}
-			<div class="mb-2"><a class="link-primary" href="{$CompanyUrl}">{$CompanyName}</a></div>
-		{/if}
-		<div><a class="link-primary" href="https://github.com/LibreBooking/librebooking">LibreBooking - GPLv3 -
-				{$DisplayVersion}</a></div>
+		<div><a class="link-primary" href="https://studiopodziemie.pl">Studio Treningu Personalnego Podziemie</a></div>
 	</footer>
 
 	<div class="toast-container position-fixed bottom-0 end-0 p-3">

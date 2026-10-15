@@ -27,7 +27,7 @@
 }
 
 [data-bs-theme='dark_red'] {
-  --primary: #6b2d3a;
+  --primary: #59000A  ;
   --primary-hover: color-mix(in oklab, var(--primary) 80%, black);
   --primary-disabled: color-mix(in oklab, var(--primary) 40%, white);
   --text-color-btn: #ffffff;
